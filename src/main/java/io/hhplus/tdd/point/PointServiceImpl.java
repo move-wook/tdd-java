@@ -5,6 +5,8 @@ import io.hhplus.tdd.database.UserPointTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PointServiceImpl implements PointService {
     //table 안쓰고 내부 메모리 구조로 TDD용 테스트
@@ -43,5 +45,10 @@ public class PointServiceImpl implements PointService {
         pointHistoryTable.insert(id, amount, TransactionType.CHARGE, System.currentTimeMillis());
 
         return updateUser;
+    }
+
+    @Override
+    public List<PointHistory> getUserHistoryByUserId(long id) {
+        return pointHistoryTable.selectAllByUserId(id);
     }
 }

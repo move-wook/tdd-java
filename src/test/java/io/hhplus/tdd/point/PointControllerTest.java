@@ -9,6 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -56,6 +58,28 @@ public class PointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.point").value(130));
+    }
+
+    @Test
+    @DisplayName("포인트충전시정상적으로url호출시정상응답을반환한다")
+    public void 포인트내역조회시정상적으로url호출시정상응답을반환한다() throws Exception {
+        long id = 1L;
+        List<PointHistory> history = List.of(
+                new PointHistory(1,id,-50, TransactionType.USE , System.currentTimeMillis()),
+                new PointHistory(2,id,100, TransactionType.CHARGE,  System.currentTimeMillis())
+        );
+
+        // Mock 설정
+        when(pointService.getUserHistoryByUserId(id)).thenReturn(history);
+
+        mockMvc.perform(get("/point/{id}/histories", id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(id))
+                .andExpect(jsonPath("$[0].type").value(TransactionType.USE.name()))
+                .andExpect(jsonPath("$[0].amount").value(-50))
+                .andExpect(jsonPath("$[1].type").value(TransactionType.CHARGE.name()))
+                .andExpect(jsonPath("$[1].amount").value(100));
     }
 
 

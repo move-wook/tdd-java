@@ -32,9 +32,9 @@ public class PointController {
      */
     @GetMapping("{id}/histories")
     public List<PointHistory> history(
-            @PathVariable long id
+            @PathVariable("id") long id
     ) {
-        return List.of();
+        return pointService.getUserHistoryByUserId(id);
     }
 
     /**
