@@ -82,5 +82,23 @@ public class PointControllerTest {
                 .andExpect(jsonPath("$[1].amount").value(100));
     }
 
+    @Test
+    @DisplayName("포인트사용시정상적으로url호출시정상응답을반환한다")
+    public void 포인트사용시정상적으로url호출시정상응답을반환한다() throws Exception {
+        long id = 1L;
+        int usePoints = 50;
+        UserPoint updatedUserPoint = new UserPoint(id, 50, System.currentTimeMillis());
+
+        // Mock 설정
+        when(pointService.use(id, usePoints)).thenReturn(updatedUserPoint);
+        String requestBody = String.valueOf(usePoints);
+        mockMvc.perform(patch("/point/{id}/use",id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))// 요청 본문
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.point").value(50));
+    }
+
 
 }

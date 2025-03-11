@@ -14,6 +14,7 @@ public class PointServiceImpl implements PointService {
     private final PointHistoryTable pointHistoryTable;
 
     private final long MAX_POINT = 100000L;
+    private final long MIN_POINT = 0L;
 
     public PointServiceImpl(UserPointTable userPointTable, PointHistoryTable pointHistoryTable) {
         this.userPointTable = userPointTable;
@@ -50,5 +51,23 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<PointHistory> getUserHistoryByUserId(long id) {
         return pointHistoryTable.selectAllByUserId(id);
+    }
+
+    @Override
+    public UserPoint use(long id, long amount) {
+        if(id < 1){ throw new IllegalArgumentException("유효하지 않은 사용자 입니다.");}
+        if(amount < 1){ throw new IllegalArgumentException("유효하지 않은 금액입니다.");}
+
+        UserPoint currentUser = userPointTable.selectById(id);
+
+        long totalAmount = currentUser.point() - amount;
+
+        if(MIN_POINT >= totalAmount){
+            throw new IllegalArgumentException("잔고에 금액이 부족합니다.");
+        }
+
+        UserPoint userPoint = userPointTable.insertOrUpdate(id, totalAmount);
+        pointHistoryTable.insert(id, amount, TransactionType.USE, System.currentTimeMillis());
+        return userPoint;
     }
 }
