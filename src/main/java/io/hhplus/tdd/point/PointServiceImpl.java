@@ -2,7 +2,6 @@ package io.hhplus.tdd.point;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,6 +49,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointHistory> getUserHistoryByUserId(long id) {
+        if(id < 1){ throw new IllegalArgumentException("유효하지 않은 사용자 입니다.");}
         return pointHistoryTable.selectAllByUserId(id);
     }
 
